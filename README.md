@@ -1,15 +1,12 @@
-# Taskly
+# Clinic Greeting Lookup
 
-A lightweight to-do list application built with plain HTML, CSS, and JavaScript.
+A browser-only lookup page that downloads `Persistent Variable Sheet.xlsx` over HTTP and returns the greeting type associated with a clinic password.
 
-## Features
+## How it works
 
-- Add, complete, and delete tasks
-- Filter by all, active, or completed tasks
-- Clear all completed tasks
-- Automatically persists tasks with `localStorage`
-- Responsive layout with no build step required
+- The page fetches the workbook from the repository's raw GitHub URL.
+- SheetJS parses the first worksheet in the browser.
+- The first row is treated as the header row. The page recognizes `Clinic Password` (or `Password`) and `Greeting Type` (or `Greeting`) columns.
+- Entering a password searches the loaded rows and displays the matching greeting type.
 
-## Run locally
-
-Open `index.html` in a browser. No server or dependencies are required.
+Open `index.html` through a web server or GitHub Pages. The spreadsheet must be publicly accessible for a browser HTTP request, and the raw GitHub URL must remain available to avoid CORS issues.

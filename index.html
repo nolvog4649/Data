@@ -1,181 +1,108 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A simple to-do list that saves your tasks locally." />
-  <title>Taskly — To-do list</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Look up a greeting type using a clinic password.">
+  <title>Clinic Greeting Lookup</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #f5f7fb;
-      --surface: #ffffff;
-      --text: #172033;
-      --muted: #6c7486;
-      --border: #e5e8ef;
-      --primary: #5b5ce2;
-      --primary-dark: #4546c4;
-      --danger: #c53d58;
-      --shadow: 0 16px 45px rgba(42, 48, 83, .10);
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at top, #eef0ff 0, var(--bg) 42rem);
-    }
-    button, input { font: inherit; }
-    button { cursor: pointer; }
-    .app { width: min(100% - 2rem, 760px); margin: 0 auto; padding: 4.5rem 0 3rem; }
-    .hero { margin-bottom: 1.5rem; }
-    .eyebrow { margin: 0 0 .5rem; color: var(--primary); font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 4rem); letter-spacing: -.06em; line-height: 1; }
-    .subtitle { margin: .85rem 0 0; color: var(--muted); font-size: 1.05rem; }
-    .card { overflow: hidden; background: var(--surface); border: 1px solid rgba(229, 232, 239, .85); border-radius: 22px; box-shadow: var(--shadow); }
-    .composer { display: flex; gap: .75rem; padding: 1rem; border-bottom: 1px solid var(--border); }
-    .composer input { min-width: 0; flex: 1; padding: .9rem 1rem; border: 1px solid var(--border); border-radius: 12px; outline: none; background: #fafbfe; color: var(--text); }
-    .composer input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(91, 92, 226, .14); }
-    .primary { border: 0; border-radius: 12px; padding: 0 1.25rem; background: var(--primary); color: white; font-weight: 700; transition: background .2s, transform .2s; }
-    .primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; color: var(--muted); font-size: .9rem; }
-    .filters { display: flex; gap: .25rem; flex-wrap: wrap; }
-    .filter, .clear { border: 0; border-radius: 8px; padding: .45rem .7rem; background: transparent; color: var(--muted); }
-    .filter.active { background: #eeefff; color: var(--primary-dark); font-weight: 700; }
-    .clear:hover { color: var(--danger); }
-    .tasks { list-style: none; margin: 0; padding: 0 .75rem .75rem; }
-    .task { display: flex; align-items: center; gap: .8rem; padding: .85rem .5rem; border-top: 1px solid var(--border); animation: appear .2s ease-out; }
-    .task:first-child { border-top: 0; }
-    .check { width: 1.35rem; height: 1.35rem; flex: 0 0 auto; margin: 0; accent-color: var(--primary); cursor: pointer; }
-    .task-text { flex: 1; overflow-wrap: anywhere; line-height: 1.45; }
-    .task.done .task-text { color: var(--muted); text-decoration: line-through; }
-    .delete { border: 0; padding: .35rem; background: transparent; color: #aeb4c2; font-size: 1.2rem; line-height: 1; }
-    .delete:hover { color: var(--danger); }
-    .empty { padding: 2.5rem 1rem; color: var(--muted); text-align: center; }
-    .empty strong { display: block; margin-bottom: .35rem; color: var(--text); font-size: 1.1rem; }
-    .storage-note { margin: 1rem 0 0; color: var(--muted); font-size: .82rem; text-align: center; }
-    @keyframes appear { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 520px) { .app { padding-top: 2.5rem; } .composer { flex-direction: column; } .primary { min-height: 3rem; } .toolbar { align-items: flex-start; flex-direction: column; } }
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 1rem; }
+    main { width: min(100%,  Thirtyrem); width: min(100%, 30rem); padding: 2rem; background: white; border: 1px solid #e5e8ef; border-radius: 1rem; box-shadow: 0 16px 45px rgba(42,48,83,.1); }
+    h1 { margin-top: 0; }
+    p { color: #657087; }
+    label { display: block; margin: 1.5rem 0 .4rem; font-weight: 700; }
+    input, button { width: 100%; box-sizing: border-box; padding: .8rem 1rem; border-radius: .6rem; font: inherit; }
+    input { border: 1px solid #ccd2df; }
+    input:focus { outline: 3px solid #dfe1ff; border-color: #5b5ce2; }
+    button { margin-top: 1rem; border: 0; background: #5b5ce2; color: white; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { min-height: 1.5rem; margin-top: 1rem; }
+    #result { margin-top: 1rem; padding: 1rem; border-radius: .6rem; background: #eef0ff; font-size: 1.1rem; }
+    .error { color: #b4233c; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header class="hero">
-      <p class="eyebrow">Your personal planner</p>
-      <h1>Get things done.</h1>
-      <p class="subtitle">A focused list for everything on your mind.</p>
-    </header>
-
-    <section class="card" aria-label="To-do list">
-      <form class="composer" id="todo-form">
-        <input id="todo-input" type="text" maxlength="200" placeholder="What needs to be done?" autocomplete="off" aria-label="New task" required />
-        <button class="primary" type="submit">Add task</button>
-      </form>
-      <div class="toolbar">
-        <span id="count" aria-live="polite">0 tasks left</span>
-        <nav class="filters" aria-label="Task filters">
-          <button class="filter active" type="button" data-filter="all">All</button>
-          <button class="filter" type="button" data-filter="active">Active</button>
-          <button class="filter" type="button" data-filter="completed">Completed</button>
-        </nav>
-        <button class="clear" id="clear-completed" type="button">Clear completed</button>
-      </div>
-      <ul class="tasks" id="todo-list"></ul>
-    </section>
-    <p class="storage-note">Your tasks are saved automatically in this browser.</p>
+  <main>
+    <h1>Clinic Greeting Lookup</h1>
+    <p>Enter a clinic password to find its associated greeting type.</p>
+    <form id="lookup-form">
+      <label for="password">Clinic Password</label>
+      <input id="password" name="password" type="password" autocomplete="off" required>
+      <button id="lookup-button" type="submit">Look up greeting</button>
+    </form>
+    <p id="status" role="status" aria-live="polite"></p>
+    <div id="result" class="hidden" role="alert"></div>
   </main>
 
   <script>
-    const STORAGE_KEY = 'taskly.todos.v1';
-    let todos = loadTodos();
-    let currentFilter = 'all';
+    const SPREADSHEET_URL = 'https://raw.githubusercontent.com/nolvog4649/Data/main/Persistent%20Variable%20Sheet.xlsx';
+    const form = document.querySelector('#lookup-form');
+    const passwordInput = document.querySelector('#password');
+    const button = document.querySelector('#lookup-button');
+    const status = document.querySelector('#status');
+    const result = document.querySelector('#result');
+    let rowsPromise;
 
-    const form = document.querySelector('#todo-form');
-    const input = document.querySelector('#todo-input');
-    const list = document.querySelector('#todo-list');
-    const count = document.querySelector('#count');
-
-    function loadTodos() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        return Array.isArray(saved) ? saved : [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function saveTodos() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    }
-
-    function visibleTodos() {
-      if (currentFilter === 'active') return todos.filter(todo => !todo.completed);
-      if (currentFilter === 'completed') return todos.filter(todo => todo.completed);
-      return todos;
-    }
-
-    function render() {
-      const visible = visibleTodos();
-      const remaining = todos.filter(todo => !todo.completed).length;
-      count.textContent = `${remaining} ${remaining === 1 ? 'task' : 'tasks'} left`;
-      list.innerHTML = '';
-
-      if (!visible.length) {
-        const empty = document.createElement('li');
-        empty.className = 'empty';
-        empty.innerHTML = `<strong>${todos.length ? 'Nothing here yet' : 'Your list is clear'}</strong><span>${todos.length ? 'Try another filter.' : 'Add a task above to get started.'}</span>`;
-        list.append(empty);
-        return;
-      }
-
-      visible.forEach(todo => {
-        const item = document.createElement('li');
-        item.className = `task${todo.completed ? ' done' : ''}`;
-        item.innerHTML = `
-          <input class="check" type="checkbox" ${todo.completed ? 'checked' : ''} aria-label="Mark task complete" />
-          <span class="task-text"></span>
-          <button class="delete" type="button" aria-label="Delete task">×</button>`;
-        item.querySelector('.task-text').textContent = todo.text;
-        item.querySelector('.check').addEventListener('change', () => {
-          todo.completed = !todo.completed;
-          saveTodos();
-          render();
+    // Download the workbook once over HTTP, then reuse the parsed rows for lookups.
+    async function loadRows() {
+      if (!rowsPromise) {
+        rowsPromise = fetch(SPREADSHEET_URL).then(response => {
+          if (!response.ok) throw new Error(`Spreadsheet request failed (${response.status})`);
+          return response.arrayBuffer();
+        }).then(buffer => {
+          const workbook = XLSX.read(buffer, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          return XLSX.utils.sheet_to_json(sheet, { defval: '' });
         });
-        item.querySelector('.delete').addEventListener('click', () => {
-          todos = todos.filter(entry => entry.id !== todo.id);
-          saveTodos();
-          render();
-        });
-        list.append(item);
-      });
+      }
+      return rowsPromise;
     }
 
-    form.addEventListener('submit', event => {
+    function normalise(value) {
+      return String(value).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function findColumn(row, names) {
+      return Object.keys(row).find(key => names.includes(normalise(key)));
+    }
+
+    form.addEventListener('submit', async event => {
       event.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      todos.unshift({ id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`, text, completed: false });
-      saveTodos();
-      input.value = '';
-      render();
-      input.focus();
+      result.classList.add('hidden');
+      status.className = '';
+      status.textContent = 'Loading spreadsheet…';
+      button.disabled = true;
+
+      try {
+        const rows = await loadRows();
+        if (!rows.length) throw new Error('The spreadsheet contains no data rows.');
+        const passwordColumn = findColumn(rows[0], ['clinicpassword', 'password']);
+        const greetingColumn = findColumn(rows[0], ['greetingtype', 'greeting']);
+        if (!passwordColumn || !greetingColumn) {
+          throw new Error('Required columns were not found. Expected Clinic Password and Greeting Type.');
+        }
+
+        const entered = normalise(passwordInput.value);
+        const match = rows.find(row => normalise(row[passwordColumn]) === entered);
+        if (!match) {
+          status.textContent = 'No clinic was found for that password.';
+          status.className = 'error';
+          return;
+        }
+        result.textContent = `Greeting type: ${match[greetingColumn]}`;
+        result.classList.remove('hidden');
+        status.textContent = '';
+      } catch (error) {
+        rowsPromise = null;
+        status.textContent = error.message;
+        status.className = 'error';
+      } finally {
+        button.disabled = false;
+      }
     });
-
-    document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => {
-      currentFilter = button.dataset.filter;
-      document.querySelectorAll('.filter').forEach(item => item.classList.toggle('active', item === button));
-      render();
-    }));
-
-    document.querySelector('#clear-completed').addEventListener('click', () => {
-      todos = todos.filter(todo => !todo.completed);
-      saveTodos();
-      render();
-    });
-
-    render();
   </script>
 </body>
 </html>
