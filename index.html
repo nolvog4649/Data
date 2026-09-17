@@ -9,7 +9,7 @@
   <style>
     :root { color-scheme: light; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 1rem; }
-    main { width: min(100%,  Thirtyrem); width: min(100%, 30rem); padding: 2rem; background: white; border: 1px solid #e5e8ef; border-radius: 1rem; box-shadow: 0 16px 45px rgba(42,48,83,.1); }
+    main { width: min(100%, 30rem); padding: 2rem; background: white; border: 1px solid #e5e8ef; border-radius: 1rem; box-shadow: 0 16px 45px rgba(42,48,83,.1); }
     h1 { margin-top: 0; }
     p { color: #657087; }
     label { display: block; margin: 1.5rem 0 .4rem; font-weight: 700; }
@@ -46,27 +46,48 @@
     const result = document.querySelector('#result');
     let rowsPromise;
 
-    // Download the workbook once over HTTP, then reuse the parsed rows for lookups.
     async function loadRows() {
       if (!rowsPromise) {
-        rowsPromise = fetch(SPREADSHEET_URL).then(response => {
-          if (!response.ok) throw new Error(`Spreadsheet request failed (${response.status})`);
-          return response.arrayBuffer();
-        }).then(buffer => {
-          const workbook = XLSX.read(buffer, { type: 'array' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          return XLSX.utils.sheet_to_json(sheet, { defval: '' });
-        });
+        rowsPromise = fetch(SPREADSHEET_URL)
+          .then(response => {
+            if (!response.ok) throw new Error(`Spreadsheet request failed (${response.status})`);
+            return response.arrayBuffer();
+          })
+          .then(buffer => {
+            const workbook = XLSX.read(buffer, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            return XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          });
       }
       return rowsPromise;
     }
 
-    function normalise(value) {
-      return String(value).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    function normalize(value) {
+      return String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     }
 
-    function findColumn(row, names) {
-      return Object.keys(row).find(key => names.includes(normalise(key)));
+    function findHeader(row, allowedNames) {
+      const normalizedAllowed = allowedNames.map(name => normalize(name));
+      return Object.keys(row).find(header => normalizedAllowed.includes(normalize(header)));
+    }
+
+    async function lookupGreetingType(password) {
+      const rows = await loadRows();
+      if (!rows.length) throw new Error('The spreadsheet contains no data rows.');
+
+      const passwordHeader = findHeader(rows[0], ['Clinic Password', 'Password']);
+      const greetingHeader = findHeader(rows[0], ['Greeting Type', 'Greeting']);
+
+      if (!passwordHeader || !greetingHeader) {
+        throw new Error('Expected columns were not found: Clinic Password and Greeting Type.');
+      }
+
+      const match = rows.find(row => normalize(row[passwordHeader]) === normalize(password));
+      if (!match) {
+        return null;
+      }
+
+      return match[greetingHeader];
     }
 
     form.addEventListener('submit', async event => {
@@ -77,22 +98,20 @@
       button.disabled = true;
 
       try {
-        const rows = await loadRows();
-        if (!rows.length) throw new Error('The spreadsheet contains no data rows.');
-        const passwordColumn = findColumn(rows[0], ['clinicpassword', 'password']);
-        const greetingColumn = findColumn(rows[0], ['greetingtype', 'greeting']);
-        if (!passwordColumn || !greetingColumn) {
-          throw new Error('Required columns were not found. Expected Clinic Password and Greeting Type.');
+        const password = passwordInput.value.trim();
+        if (!password) {
+          throw new Error('Please enter a clinic password.');
         }
 
-        const entered = normalise(passwordInput.value);
-        const match = rows.find(row => normalise(row[passwordColumn]) === entered);
-        if (!match) {
-          status.textContent = 'No clinic was found for that password.';
+        const greetingType = await lookupGreetingType(password);
+
+        if (!greetingType) {
+          status.textContent = 'No clinic password match was found.';
           status.className = 'error';
           return;
         }
-        result.textContent = `Greeting type: ${match[greetingColumn]}`;
+
+        result.textContent = `Greeting type: ${greetingType}`;
         result.classList.remove('hidden');
         status.textContent = '';
       } catch (error) {
